@@ -72,7 +72,7 @@ class Air:
         return f'{self.__air_to_string("summary", self.weather)}'
 
     def __get_sub_dict(self, key_array) -> dict:
-        return {k: self.weather[k] for k in self.weather.keys() & key_array}
+        return {key: self.weather[key] for key in key_array}
 
     def set_weather_with_array(self, data_array: List) -> NoReturn:
         weather_keys = list(self.weather.keys())
