@@ -18,9 +18,9 @@ class Air:
             'moonPhase': 'n/a',
             'humidity': 'n/a',
             'dewPoint': 'n/a',
-            'weatherCode': 'n/a',
+            'weather_code': 'n/a',
             'precipitationProbability': 'n/a',
-            'precipitationType': 'n/a',
+            'precipitation_type': 'n/a',
             'pressureSurfaceLevel': 'n/a',
             'epaIndex': 'n/a',
             'epaHealthConcern': 'n/a',
@@ -35,7 +35,7 @@ class Air:
             'treeIndex': 'n/a',
             'weedIndex': 'n/a'
         }
-        self.single_value_attributes: List[str] = ['moonPhase', 'weatherCode', 'precipitationType',
+        self.single_value_attributes: List[str] = ['moonPhase', 'weather_code', 'precipitation_type',
                                                    'epaHealthConcern', 'epaPrimaryPollutant',
                                                    'grassIndex', 'treeIndex', 'weedIndex', 'date']
         if weather_data:
@@ -85,7 +85,7 @@ class Air:
 
     def get_basic_weather(self) -> dict:
         return self.__get_sub_dict(['date', 'temperature', 'temperatureApparent', 'moonPhase', 'humidity', 'dewPoint',
-                                    'weatherCode', 'precipitationProbability', 'precipitationType',
+                                    'weather_code', 'precipitationProbability', 'precipitation_type',
                                     'pressureSurfaceLevel'])
 
     def get_pollution(self) -> dict:
