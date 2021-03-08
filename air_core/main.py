@@ -1,4 +1,4 @@
-from air import Air
+from library.air import Air
 
 if __name__ == '__main__':
     air_array = ['2021-02-27T14:08:00-05:00', '83.98', '83.91', 'n/a', '38', '55.71', 'Mostly Clear', '0', 'Rain',
