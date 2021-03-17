@@ -35,15 +35,18 @@ class Air:
             'treeIndex': 'n/a',
             'weedIndex': 'n/a'
         }
-        self.single_value_attributes: List[str] = ['moonPhase', 'weatherCode', 'precipitationType',
-                                                   'epaHealthConcern', 'epaPrimaryPollutant',
-                                                   'grassIndex', 'treeIndex', 'weedIndex', 'date']
+        self.single_value_attributes: List[str] = ['grassIndex', 'treeIndex', 'weedIndex', 'date']
+        self.single_value_mapped_attributes: List[str] = ['moonPhase', 'weatherCode', 'precipitationType',
+                                                          'epaHealthConcern', 'epaPrimaryPollutant']
+
         if weather_data:
             for key in weather_data:
                 self.__set_weather_attribute(key, weather_data[key])
 
     def __set_weather_attribute(self, attribute_type: str, attribute_value: Any) -> NoReturn:
         if attribute_type in self.single_value_attributes:
+            self.weather[f'{attribute_type}'] = attribute_value
+        elif attribute_type in self.single_value_mapped_attributes:
             if isinstance(attribute_value, int):
                 self.weather[f'{attribute_type}'] = self.unit_standard[f'{attribute_type}'][f'{attribute_value}']
             else:
@@ -56,7 +59,7 @@ class Air:
     def __air_to_string(self, output_type: str, data: dict) -> str:
         data_as_string = ''
         for key in data:
-            if key in self.single_value_attributes:
+            if key in self.single_value_attributes or key in self.single_value_mapped_attributes:
                 if output_type == 'summary':
                     data_as_string += f'{key}: {data[key]},'
                 else:
