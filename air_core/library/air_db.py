@@ -2,7 +2,7 @@ import logging.config
 import os
 from air_core.library.air import Air
 from willow_core.library.sqlite_db import SqlLiteDb
-from sqlite3 import Connection, Cursor, Error
+from sqlite3 import Connection, Cursor, Error, Row
 from typing import Any
 
 
@@ -85,13 +85,13 @@ class AirDb(SqlLiteDb):
         except Exception as e:
             self._logger.exception(f'Exception was thrown', e)
 
-    def get_forecast_weather(self) -> list[dict]:
+    def get_forecast_weather(self) -> list[Row]:
         return self.get_weather('FORECAST_WEATHER')
 
-    def get_current_weather(self) -> list[dict]:
+    def get_current_weather(self) -> list[Row]:
         return self.get_weather('CURRENT_WEATHER')
 
-    def get_weather(self, table_name: str) -> list[dict]:
+    def get_weather(self, table_name: str) -> list[Row]:
         try:
             conn: Connection = self._db_connect()
             self.set_row_factory(conn)
