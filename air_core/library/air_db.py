@@ -3,7 +3,7 @@ import os
 from air_core.library.air import Air
 from willow_core.library.sqlite_db import SqlLiteDb
 from sqlite3 import Connection, Cursor, Error, Row
-from typing import Any
+from typing import Any, Optional
 
 
 class AirDb(SqlLiteDb):
@@ -86,7 +86,7 @@ class AirDb(SqlLiteDb):
             self._logger.exception(f'Exception was thrown', e)
 
     def get_weather_history(self) -> list[dict]:
-        weather_history: list[Row] = self.get_weather('WEATHER_HISTORY')
+        weather_history: list[Row] = self.get_weather()
         weather_history_dicts: list[dict] = [self._table_row_to_dict(row) for row in weather_history]
         return weather_history_dicts
 
@@ -99,12 +99,12 @@ class AirDb(SqlLiteDb):
         weather_forecast_dicts: list[dict] = [self._table_row_to_dict(row) for row in weather_forecast]
         return weather_forecast_dicts
 
-    def get_weather(self, query_type: str) -> list[Row]:
-        query: str = f'select * from WEATHER ORDER BY id DESC;'
-        if query_type == 'WEATHER_HISTORY':
-            query: str = f'select * from WEATHER ORDER BY id DESC;'
+    def get_weather(self, query_type: Optional[str] = None) -> list[Row]:
+        query: str = f'select * from WEATHER ORDER BY id DESC'
+        if query_type == 'CURRENT_WEATHER':
+            query = f'{query} LIMIT 1'
         elif query_type == 'WEATHER_FORECAST':
-            query: str = f'select * from WEATHER_FORECAST ORDER BY id;'
+            query = f'select * from WEATHER_FORECAST ORDER BY id'
         try:
             conn: Connection = self._db_connect()
             self.set_row_factory(conn)
