@@ -85,20 +85,53 @@ class AirDb(SqlLiteDb):
         except Exception as e:
             self._logger.exception(f'Exception was thrown', e)
 
-    def get_forecast_weather(self) -> list[Row]:
-        return self.get_weather('FORECAST_WEATHER')
+    def get_current_weather_data(self) -> dict:
+        current_weather: list[Row] = self.get_weather('CURRENT_WEATHER')
+        return self._table_row_to_dict(current_weather[0])
 
-    def get_current_weather(self) -> list[Row]:
-        return self.get_weather('CURRENT_WEATHER')
+    def get_weather_forecast_data(self) -> list[dict]:
+        weather_forecast: list[Row] = self.get_weather('FORECAST_WEATHER')
+        weather_forecast_dicts: list[dict] = [self._table_row_to_dict(row) for row in weather_forecast]
+        return weather_forecast_dicts
 
     def get_weather(self, table_name: str) -> list[Row]:
+        results_order = 'DESC' if table_name == 'CURRENT_WEATHER' else 'ASC'
         try:
             conn: Connection = self._db_connect()
             self.set_row_factory(conn)
             db_cursor: Cursor = conn.cursor()
             table_results: list = db_cursor.execute(
-                f'select * from {table_name} ORDER BY id DESC;').fetchall()
+                f'select * from {table_name} ORDER BY id {results_order};').fetchall()
             self._db_close(conn)
             return table_results
         except Error as error:
             self._logger.info(f'Error occurred getting table rows from Air_DB', error)
+
+    @staticmethod
+    def _table_row_to_dict(row: Row) -> dict:
+        data: dict = dict(row)
+        return {
+            'date': data['date'],
+            'temperature': f"{data['temp_value']} {data['temp_unit']}",
+            'temperatureApparent': f"{data['temp_apparent_value']} {data['temp_apparent_unit']}",
+            'moonPhase': data['moon_phase'],
+            'humidity': f"{data['humidity_value']} {data['humidity_unit']}",
+            'dewPoint': f"{data['dew_point_value']} {data['dew_point_unit']}",
+            'weatherCode': data['weather_code'],
+            'precipitationProbability': f"{data['precipitation_probability_value']} "
+                                        f"{data['precipitation_probability_unit']}",
+            'precipitationType': data['precipitation_type'],
+            'pressureSurfaceLevel': f"{data['pressure_surface_level_value']} {data['pressure_surface_level_unit']}",
+            'epaIndex': f"{data['epa_index_value']} {data['epa_index_unit']}",
+            'epaHealthConcern': data['epa_health_concern'],
+            'epaPrimaryPollutant': data['epa_primary_pollutant'],
+            'particulateMatter10': f"{data['particulate_matter10_value']} {data['particulate_matter10_unit']}",
+            'particulateMatter25': f"{data['particulate_matter25_value']} {data['particulate_matter25_unit']}",
+            'pollutantCO': f"{data['pollutant_CO_value']} {data['temp_apparent_unit']}",
+            'pollutantNO2': f"{data['pollutant_NO2_value']} {data['pollutant_NO2_unit']}",
+            'pollutantO3': f"{data['pollutant_O3_value']} {data['pollutant_O3_unit']}",
+            'pollutantSO2': f"{data['pollutant_SO2_value']} {data['pollutant_SO2_unit']}",
+            'grassIndex': data['grass_index'],
+            'treeIndex': data['tree_index'],
+            'weedIndex': data['weed_index']
+        }

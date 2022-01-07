@@ -1,11 +1,10 @@
 # Air weather, pollution and pollen properties
-
-from typing import NoReturn, List, Any
+from typing import Any
 from .climate_cell_units import metric_units, imperial_units
 
 
 class Air:
-    def __init__(self, unit_standard: str = 'metric', weather_data: dict = None, date: str = 'n/a') -> NoReturn:
+    def __init__(self, unit_standard: str = 'metric', weather_data: dict = None, date: str = 'n/a'):
         if unit_standard == 'imperial':
             self.unit_standard: dict = imperial_units
         else:
@@ -35,15 +34,18 @@ class Air:
             'treeIndex': 'n/a',
             'weedIndex': 'n/a'
         }
-        self.single_value_attributes: List[str] = ['grassIndex', 'treeIndex', 'weedIndex', 'date']
-        self.single_value_mapped_attributes: List[str] = ['moonPhase', 'weatherCode', 'precipitationType',
+        self.single_value_attributes: list[str] = ['grassIndex', 'treeIndex', 'weedIndex', 'date']
+        self.single_value_mapped_attributes: list[str] = ['moonPhase', 'weatherCode', 'precipitationType',
                                                           'epaHealthConcern', 'epaPrimaryPollutant']
 
         if weather_data:
             for key in weather_data:
-                self.__set_weather_attribute(key, weather_data[key])
+                self._set_weather_attribute(key, weather_data[key])
 
-    def __set_weather_attribute(self, attribute_type: str, attribute_value: Any) -> NoReturn:
+    def __str__(self) -> str:
+        return f'{self._air_to_string("summary", self.weather)}'
+
+    def _set_weather_attribute(self, attribute_type: str, attribute_value: Any) -> None:
         if attribute_type in self.single_value_attributes:
             self.weather[f'{attribute_type}'] = attribute_value
         elif attribute_type in self.single_value_mapped_attributes:
@@ -56,8 +58,8 @@ class Air:
             self.weather[f'{attribute_type}']['value'] = attribute_value
             self.weather[f'{attribute_type}']['unit'] = self.unit_standard[f'{attribute_type}']
 
-    def __air_to_string(self, output_type: str, data: dict) -> str:
-        data_as_string = ''
+    def _air_to_string(self, output_type: str, data: dict) -> str:
+        data_as_string: str = ''
         for key in data:
             if key in self.single_value_attributes or key in self.single_value_mapped_attributes:
                 if output_type == 'summary':
@@ -71,43 +73,40 @@ class Air:
                     data_as_string += f'{data[key]["value"]},'
         return data_as_string.rstrip(',')
 
-    def __str__(self) -> str:
-        return f'{self.__air_to_string("summary", self.weather)}'
-
-    def __get_sub_dict(self, key_array) -> dict:
+    def _get_sub_dict(self, key_array) -> dict:
         return {key: self.weather[key] for key in key_array}
 
-    def set_weather_with_array(self, data_array: List) -> NoReturn:
-        weather_keys = list(self.weather.keys())
+    def set_weather_with_array(self, data_array: list[str]) -> None:
+        weather_keys: list[str] = list(self.weather.keys())
         for index in range(len(data_array)):
             if data_array[index] != 'n/a':
-                self.__set_weather_attribute(weather_keys[index], data_array[index])
+                self._set_weather_attribute(weather_keys[index], data_array[index])
 
     def get_all_weather(self) -> dict:
         return self.weather
 
     def get_basic_weather(self) -> dict:
-        return self.__get_sub_dict(['date', 'temperature', 'temperatureApparent', 'moonPhase', 'humidity', 'dewPoint',
-                                    'weatherCode', 'precipitationProbability', 'precipitationType',
-                                    'pressureSurfaceLevel'])
+        return self._get_sub_dict(['date', 'temperature', 'temperatureApparent', 'moonPhase', 'humidity', 'dewPoint',
+                                   'weatherCode', 'precipitationProbability', 'precipitationType',
+                                   'pressureSurfaceLevel'])
 
     def get_pollution(self) -> dict:
-        return self.__get_sub_dict(['date', 'epaIndex', 'epaHealthConcern', 'epaPrimaryPollutant',
-                                    'particulateMatter10', 'particulateMatter25', 'pollutantCO', 'pollutantNO2',
-                                    'pollutantO3', 'pollutantSO2'])
+        return self._get_sub_dict(['date', 'epaIndex', 'epaHealthConcern', 'epaPrimaryPollutant',
+                                   'particulateMatter10', 'particulateMatter25', 'pollutantCO', 'pollutantNO2',
+                                   'pollutantO3', 'pollutantSO2'])
 
     def get_pollen(self) -> dict:
-        return self.__get_sub_dict(['date', 'grassIndex', 'treeIndex', 'weedIndex'])
+        return self._get_sub_dict(['date', 'grassIndex', 'treeIndex', 'weedIndex'])
 
     def get_date(self) -> str:
         return self.weather['date']
 
     def data_to_csv_string(self) -> str:
-        data_string = f'{self.__air_to_string("csv", self.weather)}'
+        data_string: str = f'{self._air_to_string("csv", self.weather)}'
         return data_string
 
     def data_key_order(self) -> str:
-        data_as_string = ''
+        data_as_string: str = ''
         for index in self.weather:
             data_as_string += f'{index},'
         return data_as_string.rstrip(',')
