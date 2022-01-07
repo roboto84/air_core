@@ -14,7 +14,7 @@ class AirDb(SqlLiteDb):
         self._check_db_schema()
 
     def _check_db_schema(self) -> None:
-        if self._check_db_state(['CURRENT_WEATHER', 'FORECAST_WEATHER']):
+        if self._check_db_state(['WEATHER', 'WEATHER_FORECAST']):
             self._logger.info(f'DB schema looks good')
         else:
             self._logger.info(f'Tables not found')
@@ -32,17 +32,17 @@ class AirDb(SqlLiteDb):
         except Error as error:
             self._logger.info(f'Error occurred initializing Air_DB', error)
 
-    def clear_location_forecast_weather(self, lat_long: tuple[float, float]) -> None:
+    def clear_location_weather_forecast(self, lat_long: tuple[float, float]) -> None:
         try:
             conn: Connection = self._db_connect()
             db_cursor: Cursor = conn.cursor()
-            with open(f'{os.path.dirname(__file__)}/sql/delete_forecast_weather.sql') as f:
-                db_cursor.execute(f.read(), lat_long)
+            query: str = f'DELETE FROM WEATHER_FORECAST WHERE latitude = ? and longitude = ?;'
+            db_cursor.execute(query, lat_long)
             self._db_close(conn)
         except Error as error:
             self._logger.info(f'Error occurred clearing forecast weather in Air_DB', error)
 
-    def insert_forecast_weather(self, lat_long: tuple[float, float], air_data: Air) -> None:
+    def insert_weather_forecast(self, lat_long: tuple[float, float], air_data: Air) -> None:
         self._insert_weather(f'{os.path.dirname(__file__)}/sql/insert_into_forecast_weather.sql', lat_long, air_data)
 
     def insert_current_weather(self, lat_long: tuple[float, float], air_data: Air) -> None:
@@ -85,23 +85,31 @@ class AirDb(SqlLiteDb):
         except Exception as e:
             self._logger.exception(f'Exception was thrown', e)
 
-    def get_current_weather_data(self) -> dict:
+    def get_weather_history(self) -> list[dict]:
+        weather_history: list[Row] = self.get_weather('WEATHER_HISTORY')
+        weather_history_dicts: list[dict] = [self._table_row_to_dict(row) for row in weather_history]
+        return weather_history_dicts
+
+    def get_current_weather(self) -> dict:
         current_weather: list[Row] = self.get_weather('CURRENT_WEATHER')
         return self._table_row_to_dict(current_weather[0])
 
-    def get_weather_forecast_data(self) -> list[dict]:
-        weather_forecast: list[Row] = self.get_weather('FORECAST_WEATHER')
+    def get_weather_forecast(self) -> list[dict]:
+        weather_forecast: list[Row] = self.get_weather('WEATHER_FORECAST')
         weather_forecast_dicts: list[dict] = [self._table_row_to_dict(row) for row in weather_forecast]
         return weather_forecast_dicts
 
-    def get_weather(self, table_name: str) -> list[Row]:
-        results_order = 'DESC' if table_name == 'CURRENT_WEATHER' else 'ASC'
+    def get_weather(self, query_type: str) -> list[Row]:
+        query: str = f'select * from WEATHER ORDER BY id DESC;'
+        if query_type == 'WEATHER_HISTORY':
+            query: str = f'select * from WEATHER ORDER BY id DESC;'
+        elif query_type == 'WEATHER_FORECAST':
+            query: str = f'select * from WEATHER_FORECAST ORDER BY id;'
         try:
             conn: Connection = self._db_connect()
             self.set_row_factory(conn)
             db_cursor: Cursor = conn.cursor()
-            table_results: list = db_cursor.execute(
-                f'select * from {table_name} ORDER BY id {results_order};').fetchall()
+            table_results: list = db_cursor.execute(query).fetchall()
             self._db_close(conn)
             return table_results
         except Error as error:

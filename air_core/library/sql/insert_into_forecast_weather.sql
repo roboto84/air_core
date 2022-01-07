@@ -1,5 +1,5 @@
 
-INSERT INTO FORECAST_WEATHER (latitude, longitude, date,
+INSERT INTO WEATHER_FORECAST (latitude, longitude, date,
                               temp_value, temp_unit,
                               temp_apparent_value, temp_apparent_unit,
                               moon_phase,
