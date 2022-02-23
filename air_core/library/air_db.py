@@ -85,8 +85,8 @@ class AirDb(SqlLiteDb):
         except Exception as e:
             self._logger.exception(f'Exception was thrown', e)
 
-    def get_weather_history(self) -> list[dict]:
-        weather_history: list[Row] = self.get_weather()
+    def get_weather_history(self, number_of_records: int) -> list[dict]:
+        weather_history: list[Row] = self.get_weather(None, number_of_records)
         weather_history_dicts: list[dict] = [self._table_row_to_dict(row) for row in weather_history]
         return weather_history_dicts
 
@@ -99,12 +99,16 @@ class AirDb(SqlLiteDb):
         weather_forecast_dicts: list[dict] = [self._table_row_to_dict(row) for row in weather_forecast]
         return weather_forecast_dicts
 
-    def get_weather(self, query_type: Optional[str] = None) -> list[Row]:
-        query: str = f'select * from WEATHER ORDER BY id DESC'
-        if query_type == 'CURRENT_WEATHER':
-            query = f'{query} LIMIT 1'
+    def get_weather(self, query_type: Optional[str] = None, query_record_limit: Optional[int] = 0) -> list[Row]:
+        base_query: str = f'select * from WEATHER ORDER BY id DESC'
+        if query_record_limit > 0:
+            query = f'{base_query} LIMIT {query_record_limit}'
+        elif query_type == 'CURRENT_WEATHER':
+            query = f'{base_query} LIMIT 1'
         elif query_type == 'WEATHER_FORECAST':
             query = f'select * from WEATHER_FORECAST ORDER BY id'
+        else:
+            query = base_query
         try:
             conn: Connection = self._db_connect()
             self.set_row_factory(conn)
