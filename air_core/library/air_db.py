@@ -139,11 +139,11 @@ class AirDb(SqlLiteDb):
             'epaPrimaryPollutant': data['epa_primary_pollutant'],
             'particulateMatter10': f"{data['particulate_matter10_value']} {data['particulate_matter10_unit']}",
             'particulateMatter25': f"{data['particulate_matter25_value']} {data['particulate_matter25_unit']}",
-            'pollutantCO': f"{data['pollutant_CO_value']} {data['temp_apparent_unit']}",
+            'pollutantCO': f"{data['pollutant_CO_value']} {data['pollutant_CO_unit']}",
             'pollutantNO2': f"{data['pollutant_NO2_value']} {data['pollutant_NO2_unit']}",
             'pollutantO3': f"{data['pollutant_O3_value']} {data['pollutant_O3_unit']}",
             'pollutantSO2': f"{data['pollutant_SO2_value']} {data['pollutant_SO2_unit']}",
-            'grassIndex': data['grass_index'],
-            'treeIndex': data['tree_index'],
-            'weedIndex': data['weed_index']
+            'grassIndex': f"{data['grass_index']} severity",
+            'treeIndex': f"{data['tree_index']} severity",
+            'weedIndex': f"{data['weed_index']} severity"
         }
