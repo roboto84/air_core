@@ -1,6 +1,7 @@
 #  Configuration for different plotting perspectives
+from .types.types import Unit
 
-UNITS = 'imperial'
+UNITS = Unit.imperial
 TIMEZONE = 'America/New_York'
 file_settings: dict = {
     'live_data': {

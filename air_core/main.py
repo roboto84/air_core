@@ -1,6 +1,7 @@
 
 from typing import NoReturn
 from library.air import Air
+from library.types.types import Unit
 
 
 def print_out_air(air_record: Air) -> NoReturn:
@@ -36,11 +37,15 @@ if __name__ == '__main__':
     air_array = ['2021-02-27T14:08:00-05:00', '83.98', '83.91', 'n/a', '38', '55.71', 'Mostly Clear', '0', 'Rain',
                  '30', '41', 'Good', 'O3', '0.32', '0.24', '3.58', '4.01', '45.68', '3.76', '0', '0', '0']
 
-    air_from_array = Air('imperial')
+    air_from_array = Air(Unit.imperial)
     air_from_array.set_weather_with_array(air_array)
-    print('air_from_array')
+    print('air_from_array:')
     print_out_air(air_from_array)
 
-    air_from_dict = Air('imperial', air_data, '2021-02-27T14:08:00-05:00')
-    print('air_from_dict')
+    air_from_dict = Air(Unit.imperial, air_data, '2021-02-27T14:08:00-05:00')
+    print('air_from_dict:')
     print_out_air(air_from_dict)
+
+    empty_air = Air()
+    print(f'Imperial Units:\n ${empty_air.get_units(Unit.imperial)}')
+    print(f'\nMetric Units:\n ${empty_air.get_units(Unit.metric)}')

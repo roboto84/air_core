@@ -1,11 +1,12 @@
 # Air weather, pollution and pollen properties
 from typing import Any
 from .climate_cell_units import metric_units, imperial_units
+from .types.types import Unit
 
 
 class Air:
-    def __init__(self, unit_standard: str = 'metric', weather_data: dict = None, date: str = 'n/a'):
-        if unit_standard == 'imperial':
+    def __init__(self, unit_standard: Unit = Unit.metric, weather_data: dict = None, date: str = 'n/a'):
+        if unit_standard == Unit.imperial:
             self.unit_standard: dict = imperial_units
         else:
             self.unit_standard: dict = metric_units
@@ -75,6 +76,18 @@ class Air:
 
     def _get_sub_dict(self, key_array) -> dict:
         return {key: self.weather[key] for key in key_array}
+
+    def get_units(self, weather_unit_type: Unit):
+        unit_legend: dict = {}
+        if weather_unit_type == Unit.imperial:
+            units = imperial_units
+        else:
+            units = metric_units
+
+        for key in self.weather:
+            if key not in self.single_value_attributes and key not in self.single_value_mapped_attributes:
+                unit_legend[f'{key}'] = units[f'{key}']
+        return unit_legend
 
     def set_weather_with_array(self, data_array: list[str]) -> None:
         weather_keys: list[str] = list(self.weather.keys())
