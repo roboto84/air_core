@@ -47,5 +47,6 @@ if __name__ == '__main__':
     print_out_air(air_from_dict)
 
     empty_air = Air()
-    print(f'Imperial Units:\n ${empty_air.get_units(Unit.imperial)}')
-    print(f'\nMetric Units:\n ${empty_air.get_units(Unit.metric)}')
+    print(f'Metric Units:\n{empty_air.get_units()}')
+    print(f'\nImperial Units:\n{empty_air.get_units(Unit.imperial)}')
+    print(f'\nMetric Units:\n{empty_air.get_units(Unit.metric)}')

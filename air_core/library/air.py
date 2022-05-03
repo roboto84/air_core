@@ -5,8 +5,9 @@ from .types.types import Unit
 
 
 class Air:
-    def __init__(self, unit_standard: Unit = Unit.metric, weather_data: dict = None, date: str = 'n/a'):
-        if unit_standard == Unit.imperial:
+    def __init__(self, unit_choice: Unit = Unit.metric, weather_data: dict = None, date: str = 'n/a'):
+        self.unit_choice = unit_choice
+        if self.unit_choice == Unit.imperial:
             self.unit_standard: dict = imperial_units
         else:
             self.unit_standard: dict = metric_units
@@ -77,9 +78,15 @@ class Air:
     def _get_sub_dict(self, key_array) -> dict:
         return {key: self.weather[key] for key in key_array}
 
-    def get_units(self, weather_unit_type: Unit):
+    def get_units(self, weather_unit_type: Unit = None):
+        unit_type: Unit
+        if weather_unit_type:
+            unit_type = weather_unit_type
+        else:
+            unit_type = self.unit_choice
+
         unit_legend: dict = {}
-        if weather_unit_type == Unit.imperial:
+        if unit_type == Unit.imperial:
             units = imperial_units
         else:
             units = metric_units
