@@ -2,7 +2,7 @@
 from .types.types import Unit
 
 UNITS = Unit.imperial
-TIMEZONE = 'America/New_York'
+TIMEZONE = 'UTC'
 file_settings: dict = {
     'live_data': {
         'data_file': 'liveData.csv'
