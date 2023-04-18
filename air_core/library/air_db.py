@@ -106,7 +106,7 @@ class AirDb(SqlLiteDb):
         elif query_type == 'CURRENT_WEATHER':
             query = f'{base_query} LIMIT 1'
         elif query_type == 'WEATHER_FORECAST':
-            query = f'select * from WEATHER_FORECAST ORDER BY id'
+            query = f'select * from WEATHER_FORECAST ORDER BY id LIMIT 4 OFFSET 1'
         else:
             query = base_query
         try:
